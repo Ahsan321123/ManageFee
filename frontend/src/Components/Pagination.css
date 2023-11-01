@@ -1,0 +1,28 @@
+
+.Pagination{
+    z-index: 1000;
+    position:relative;
+    align-items: center;
+  }
+
+  .PaginationContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
+  }
+  
+  .pagination-wrapper {
+    background-color: #f7f7f7;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .Pagination {
+    z-index: 1000;
+    position: relative;
+    align-items: center;
+  }
+ 

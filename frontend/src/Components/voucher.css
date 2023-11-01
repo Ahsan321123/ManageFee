@@ -1,0 +1,37 @@
+.table {
+    display: table;
+    width: auto;
+    border: solid 1px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.tableRow {
+    display: table-row;
+}
+
+.tableColHeader, .tableCol {
+    display: table-cell;
+    width: 25%;
+    border: solid 1px;
+    border-left: none;
+    border-top: none;
+    text-align: center;
+}
+
+.tableColHeader {
+    background-color: #E4E4E4;
+}
+
+.tableCellHeader, .tableCell {
+    padding: 4px;
+}
+
+.tableCellHeader {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.tableCell {
+    font-size: 10px;
+}

@@ -1,0 +1,16 @@
+.enhanced-select {
+    background-color: #f8f9fa; /* Light gray background */
+    border: 1px solid #ced4da; /* Gray border */
+    border-radius: 0.25rem; /* Rounded corners */
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth transition for hover and focus states */
+}
+
+.enhanced-select:hover {
+    border-color: #2c3e50; /* Darken border on hover */
+}
+
+.enhanced-select:focus {
+    border-color: #2c3e50; /* Darken border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25); /* Add a blue glow on focus */
+    outline: 0; /* Remove default focus outline */
+}
