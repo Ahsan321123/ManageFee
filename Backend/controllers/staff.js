@@ -4,7 +4,7 @@ const bcrypt= require ('bcrypt')
 const jwt= require('jsonwebtoken')
 const staff = require('../model/staff')
 
-
+Jwt_Secret=d0abc032dd9f65321445c0b41ecf4b67
 
 exports.loginStaff= async (req,res,next)=>{
 
@@ -31,7 +31,7 @@ let isMatch = await bcrypt.compare(password,staff.password)
 
 
 if(isMatch){
-const token =  jwt.sign({ staff:staff },process.env.Jwt_Secret,{expiresIn:"3h"} )
+const token =  jwt.sign({ staff:staff },Jwt_Secret,{expiresIn:"12h"} )
 
 res.cookie("token",token,{
     expires: new Date(Date.now() + 1 * 60 * 60 * 1000), 

@@ -6,6 +6,9 @@ const studentSchema = require('../model/student')
 
 
 
+ADMIN_USERNAME=myadmin
+ADMIN_PASSWORD=admin
+Jwt_Secret=d0abc032dd9f65321445c0b41ecf4b67
 
 exports.loginAdmin=async(req,res,next)=>{
 try{
@@ -13,9 +16,9 @@ const{userName,password}=req.body
 
 let token;
 
-if( userName === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD ){
+if( userName === ADMIN_USERNAME && password === ADMIN_PASSWORD ){
   
-     token= jwt.sign({role:"admin"},process.env.Jwt_Secret,{expiresIn:"1h"})
+     token= jwt.sign({role:"admin"},Jwt_Secret,{expiresIn:"24h"})
 
      res.cookie("token",token,{
         expires: new Date(Date.now() + 1 * 60 * 60 * 1000), 
