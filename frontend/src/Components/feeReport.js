@@ -22,8 +22,11 @@ const FeeReport = () => {
 
   const token = document.cookie.split("=")[1];
 
+  
+  
   const handleDate = async (e) => {
     e.preventDefault();
+
 
     try {
       setLoading(true);
@@ -38,8 +41,10 @@ const FeeReport = () => {
             }
           )
           .then((res) => {
+            console.log(res)
             const allFeeStatus = res.data.data.map(
               (student) => student.feeStatus
+            
             );
             setFeeStatus(allFeeStatus);
 
@@ -94,11 +99,14 @@ const FeeReport = () => {
       return s < 10 ? "0" + s : s;
     }
     var d = new Date(inputFormat);
-    return [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate())].join("-");
+    return [d.getMonth() + 1, pad(d.getDate()), pad(d. getFullYear())].join("-");
   }
-
+ 
   const formattedStartDate = convertDate(startDate);
   const formattedEndDate = convertDate(endDate);
+
+
+console.log( startDate , endDate)
 
   const headers = [
     "Name",
