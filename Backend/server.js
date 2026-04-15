@@ -1,18 +1,11 @@
-const connectDatabase= require('./config/database')
-const dotenv= require('dotenv')
-const app= require('./index')
-const cors = require('cors')
+const dotenv = require('dotenv')
+dotenv.config({ path: './backend/config/config.env' })
 
-// 
-dotenv.config({path:'./backend/config/config.env'})
-app.use(cors());
+const connectDatabase = require('./config/database')
+const app = require('./index')
 
-// database connection 
 connectDatabase()
 
-
-
-app.listen( process.env.PORT,()=>{
-console.log(`connected to localhost:${process.env.PORT} ` )
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on port ${process.env.PORT}`)
 })
-

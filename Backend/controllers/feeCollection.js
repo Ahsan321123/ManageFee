@@ -140,6 +140,8 @@ feeTypes.forEach(type=>{
 exports.updateFeeStatus=async(req,res,next)=>{
 const id= req.params.id
 const feeTypes = req.body.feeType
+//  validation keys and values needed to go through 
+
     try{
       console.log("Received feeTypes:", feeTypes);
 
@@ -150,9 +152,16 @@ const feeTypes = req.body.feeType
           message:"no student found"
         })
       }
+//  feeType is required 
+
+//  check feeType and query database to check if this fee for that month isn't already paid ? 
+
+// 
+
+
 
       // feeType check 
-      let feeTypesReceived=  Object.keys(feeTypes).filter(key=> feeTypes[key] !== "")
+      let feeTypesReceived= feeTypes ? Object.keys(feeTypes).filter(key=> feeTypes[key] !== "") :null
 
     //  Month bhi receive krna hai request body
       const currentMonth= req.body.month || getMonthName(new Date().getMonth()) 
@@ -189,7 +198,7 @@ if(currentMonthFeeStatus && currentMonthFeeStatus.status === "Paid"   ){
     year:currentYear.toString(),
     feeReceived:req.body.feeReceived,
     status:req.body.status || 'pending',
-    date: req.body.date,
+    date: req.body.date ? new Date(req.body.date) : new Date(),
     feeType:feeTypesReceived? feeTypesReceived :["no fee Type"],
     comment:req.body.comment ? req.body.comment : "no comments"
   }
@@ -199,7 +208,7 @@ existingPayment.feeStatus.push(currentMonthFeeStatus)
 
   currentMonthFeeStatus.status = req.body.status
   currentMonthFeeStatus.feeReceived = req.body.feeReceived
-  currentMonthFeeStatus.date = req.body.date
+  currentMonthFeeStatus.date = req.body.date ? new Date(req.body.date) : new Date()
   currentMonthFeeStatus.comment = req.body.comment
   currentMonthFeeStatus.feeType = feeTypesReceived
 }
@@ -253,21 +262,32 @@ exports.generateBatchVouchers = async (req, res, next) => {
 
 exports.studentFeeReport= async(req,res,next)=>{
   try{
-  const startDate =  new Date( req.query.startDate)
-  const endDate= new Date(req.query.endDate) 
   if (!req.query.startDate || !req.query.endDate) {
     return res.status(400).json({ message: "Start and end dates are required." });
   }
+  const startDate = new Date(req.query.startDate)
+  const endDate = new Date(req.query.endDate)
   endDate.setHours(23, 59, 59, 999);
+
+console.log("Report query — campus:", req.staff.campus, "| startDate:", startDate, "| endDate:", endDate);
+
+// Check 1: all payments for this campus
+const allForCampus = await paymentSchema.find({ campus: req.staff.campus });
+console.log("Payments for campus:", allForCampus.length);
+
+// Check 2: sample feeStatus entries
+if (allForCampus.length > 0) {
+  console.log("Sample feeStatus[0]:", JSON.stringify(allForCampus[0].feeStatus, null, 2));
+}
 
 const payment = await paymentSchema.find({
   feeStatus: {
     $elemMatch: {
         status: "Paid",
-        date: { $gte: startDate, $lte: endDate } 
+        date: { $gte: startDate, $lte: endDate }
     }
-},
-campus: req.staff.campus
+  },
+  campus: req.staff.campus
 });
 
 

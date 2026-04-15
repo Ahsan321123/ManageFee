@@ -1,83 +1,56 @@
 const staffSchema= require('../model/staff')
 const bcrypt= require ('bcrypt')
-
 const jwt= require('jsonwebtoken')
-const staff = require('../model/staff')
-
-Jwt_Secret=d0abc032dd9f65321445c0b41ecf4b67
+const { sendSuccess, sendError } = require('../utils/response')
 
 exports.loginStaff= async (req,res,next)=>{
-
 try{
+    const {userName,password,campus}=req.body
 
-const {userName,password,campus}=req.body
+    if(!userName || !password){
+        return sendError(res, 'provide both userName and password', 400)
+    }
 
-if(!userName || !password){
+    const staff= await staffSchema.findOne({userName})
 
-    return res.status(400).json({ message: 'provide both userName and password' });
-}
+    if(!staff){
+        return sendError(res, 'Invalid credentials', 400)
+    }
+    if(campus !== staff.campus){
+        return sendError(res, 'this is not your campus', 400)
+    }
 
-const staff= await staffSchema.findOne({userName})
+    const isMatch = await bcrypt.compare(password, staff.password)
 
+    if(!isMatch){
+        return sendError(res, 'Invalid credentials', 400)
+    }
 
-if(!staff){
-    return res.status(400).json({ message: 'Invalid credentials' });
-}
-if(campus !== staff.campus){
-    return res.status(400).json({ message: 'this is not your campus' });
-}
+    // Only embed id and role in JWT — never the full document
+    const token = jwt.sign(
+        { id: staff._id, role: staff.role,campus:staff.campus },
+        process.env.JWT_SECRET,
+        { expiresIn: '12h' }
+    )
 
-let isMatch = await bcrypt.compare(password,staff.password)
+    res.cookie('token', token, {
+        expires: new Date(Date.now() + 1 * 60 * 60 * 1000),
+        httpOnly: true
+    })
 
-
-if(isMatch){
-const token =  jwt.sign({ staff:staff },Jwt_Secret,{expiresIn:"12h"} )
-
-res.cookie("token",token,{
-    expires: new Date(Date.now() + 1 * 60 * 60 * 1000), 
-    //1 hour me expire
-
-})
-return  res.json({
-    sucess:true,
-    message: `${staff.userName} logged in`,
-   user:staff,
-   token
-
-})
-}else{
-    return res.status(400).json({ message: 'Invalid credentials' });
-}
-
+    // toJSON transform on staffSchema strips password automatically
+    return sendSuccess(res, { message: `${staff.userName} logged in`, user: staff, token })
 
 }catch(err){
-    res.status(400).json({
-        succes:false,
-        message:err.message
-    })
+    return sendError(res, err.message, 500)
 }
-
 }
 
 exports.logoutStaff=async(req,res,next)=>{
     try{
-res.cookie("token","", {
-    expiresIn: new Date(0)
-
-}) 
-
-res.status(200).json({
-    sucess :true,
-    message:"user logout sucessfully"
-})
- }catch(err){
-
-    res.status(500).json({
-        sucess :false,
-        message:err.message})
-
-
- }
-
-    
+        res.cookie('token', '', { expires: new Date(0), httpOnly: true })
+        return sendSuccess(res, { message: 'user logout successfully' })
+    }catch(err){
+        return sendError(res, err.message, 500)
+    }
 }

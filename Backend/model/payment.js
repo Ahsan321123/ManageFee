@@ -1,69 +1,66 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose')
 
+const feeStatusSchema = new mongoose.Schema({
+    month: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['Paid', 'Due', 'pending'],
+        default: 'pending'
+    },
+    feeReceived: {
+        type: Number
+    },
+    date: {
+        type: Date
+    },
+    feeType: {
+        type: [String],
+        default: []
+    },
+    comment: {
+        type: String,
+        default: 'no comments'
+    }
+}, { _id: false })
 
 const paymentSchema = new mongoose.Schema({
-studentId:{
-type:mongoose.Schema.Types.ObjectId,
-ref:"studentSchema"
-},
-studentName:{
-type:String,
-
-},
-GRNo:{
-    type:Number,
-},
-className:{
-    type:String,
-},
-feeStatus:[{
-
-    month :{
-        type:String,
-        default: allMonths(new Date(Date.now()).getMonth())
+    studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'studentSchema',
+        required: true
     },
-    year:{
-        type:String,
-    required:true
+    studentName: {
+        type: String,
+        required: true
     },
-    status:{
-        type:String,
-        required:true
+    GRNo: {
+        type: String,
+        required: true
     },
-    date:{
-        type:Date,
-        // required:true
+    className: {
+        type: String
     },
-    feeReceived:{
-        type:Number,
-        // required:true
+    campus: {
+        type: String,
+        required: true
     },
-    feeType:{
-        type:Array,
+    date: {
+        type: String
     },
-    comment:{
-        type:String
-    } 
-}],
+    bankName: {
+        type: String
+    },
+    feeStatus: {
+        type: [feeStatusSchema],
+        default: []
+    }
+}, { timestamps: true })
 
-bankName:{
-    type: String,
-
-},
-
-campus:{
-    type:String,
-    required:true
-},
-
-});
-
-function allMonths( ind ){
-let months= [ "Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
-return months[ ind ]
-
-
-}
-
-module.exports=mongoose.model("paymentSchema",paymentSchema)
+module.exports = mongoose.model('Payment', paymentSchema)

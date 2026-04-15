@@ -1,83 +1,32 @@
+
 const staffSchema= require('../model/staff')
 const bcrypt= require ('bcrypt')
 const jwt = require('jsonwebtoken')
-
+const adminService = require('../services/adminService')
 const studentSchema = require('../model/student')
-
-
-
-ADMIN_USERNAME=myadmin
-ADMIN_PASSWORD=admin
-Jwt_Secret=d0abc032dd9f65321445c0b41ecf4b67
+const staff = require('../model/staff')
+const { sendSuccess, sendError } = require('../utils/response')
 
 exports.loginAdmin=async(req,res,next)=>{
 try{
-const{userName,password}=req.body
-
-let token;
-
-if( userName === ADMIN_USERNAME && password === ADMIN_PASSWORD ){
-  
-     token= jwt.sign({role:"admin"},Jwt_Secret,{expiresIn:"24h"})
-
-     res.cookie("token",token,{
-        expires: new Date(Date.now() + 1 * 60 * 60 * 1000), 
-        //1 hour me expire
-    
-    })
-    
-     res.status(200).json({
-        success:true,
-        message:"Admin logged in",
-        token,
-        role:"admin"
-        
-    })
-   
-
-}else{
-    res.status(401).json({
-        success:false,
-        message:"invalid credentials",
-    })
-}
-
-
-
+    const{userName,password}=req.body
+    const result = await adminService.loginAdmin({userName,password})
+    return sendSuccess(res, { data: result })
 }catch(err){
-    res.status(400).json({
-        success:false,
-        message:err.message,
-   
-    })
+    return sendError(res, err.message, err.status || 400)
 }
-
-
-
 }
 
 
 
 
 exports.logoutAdmin= async(req,res,next)=>{
-
 try{
-  res.cookie("token","",{
-    expiresIn:Date.now(0)
-  })
-  res.status(200).json({
-    sucess:true,
-    message:"Admin logged out",
-
-})
+    res.cookie('token', '', { expires: new Date(0), httpOnly: true })
+    return sendSuccess(res, { message: 'Admin logged out' })
 }catch(err){
-    res.status(400).json({
-        success:false,
-        message:err.message,
-    
-    })
+    return sendError(res, err.message, 400)
 }
-
 }
 
 
@@ -111,21 +60,22 @@ else{
 
 exports.createStaff = async (req, res, next) => {
   try {
-    const { userName, password, campus } = req.body;
+    const data = req.body;
     const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
+    const hashPassword = await bcrypt.hash(data.password, salt);
     const staffData = await staffSchema.create({
-      userName,
+      userName:data.userName,
       password: hashPassword,
-      campus,
-    });
+      campus:data.campus,
+    })
+   const { password , ...withoutPassword} = staffData.toObject() 
 
-    console.log(userName, password, campus);
+
 
     res.status(200).json({
       sucess: true,
       message: "staff created",
-      staffData,
+      data:withoutPassword,
     });
   } catch (err) {
     res.status(400).json({

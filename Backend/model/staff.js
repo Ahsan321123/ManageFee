@@ -19,5 +19,12 @@ role:{
 
 })
 
+staffSchema.set('toJSON', {
+    transform: (doc, ret) => {
+        delete ret.password
+        delete ret.__v
+        return ret
+    }
+})
 
 module.exports=mongoose.model("staffSchema",staffSchema)

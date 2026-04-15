@@ -2,17 +2,20 @@ const studentSchema = require('../model/student')
 const paymentSchema= require('../model/payment')
 const classSchema= require('../model/class')
 const staffSchema= require('../model/staff')
+const { sendError } = require('../utils/response')
 
 exports.createStudent = async( req,res,next )=>{
 try{
-
+    const staff = req.staff
+    if(!staff) sendError(_,"you are not authorized to do this action")
     const receivedClass= req.body.class
     
+
 const studentBody={
 ...req.body,
 className:receivedClass,
-campus: req.staff.campus,
-createdBy:req.staff.userName 
+campus: staff.campus,
+createdBy:staff.userName 
 }
 
 
